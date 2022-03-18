@@ -1,4 +1,36 @@
 ---
+- name: "reset root password to empty upon first install"
+  block:
+  - systemd:
+      name: "{{ mysql_daemon }}"
+      state: stopped
+  - lineinfile:
+      path:  /etc/my.cnf
+      regexp: '^skip-grant-tables'
+      line: 'skip-grant-tables'
+      owner: root
+      group: root
+      mode: '0644'
+  - systemd:
+      name: "{{ mysql_daemon }}"
+      state: started
+  - command: |
+      mysql -NBe "FLUSH PRIVILEGES; SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
+    changed_when: false
+    check_mode: false
+  - systemd:
+      name: "{{ mysql_daemon }}"
+      state: stopped
+  - lineinfile:
+      path:  /etc/my.cnf
+      regexp: '^skip-grant-tables'
+      state: absent
+  - systemd:
+      name: "{{ mysql_daemon }}"
+      stated: started
+  when: mysql_install_packages
+      
+
 - name: Ensure default user is present.
   mysql_user:
     name: "{{ mysql_user_name }}"

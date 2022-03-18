@@ -51,6 +51,23 @@
     mode: 0755
     setype: mysqld_db_t
 
+- name: Check for mysqld error log parent directory
+  stat:
+    path: "{{ mysql_log_error | dirname }}"
+  register: log_dir
+  when: mysql_log_error is defined
+
+- name: Create mysqld error log parent directory if missing
+  file:
+    path: "{{ mysql_log_error | dirname }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: '0775'
+  when:
+  - mysql_log_error is defined
+  - not log_dir.stat.exists
+
 - name: Set ownership on slow query log file (if configured).
   file:
     path: "{{ mysql_slow_query_log_file }}"

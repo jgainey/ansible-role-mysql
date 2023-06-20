@@ -7,7 +7,7 @@
       state: stopped
   - name: add skip-grant-tables
     lineinfile:
-      path:  /etc/my.cnf
+      path: "{{ mysql_config_file }}"
       regexp: '^skip-grant-tables'
       insertafter: '^[[]mysqld[]]'
       line: 'skip-grant-tables'
@@ -39,7 +39,7 @@
       state: stopped
   - name: remove skip-grant-tables
     lineinfile:
-      path:  /etc/my.cnf
+      path: "{{ mysql_config_file }}"
       regexp: '^skip-grant-tables'
       state: absent
   - name: start systemd

@@ -25,14 +25,7 @@
     register: mysql_version_register
   - debug:
       msg: "{{ mysql_version_register.stdout }}"
-    when: mysql_version_register.stdout is version('8.0',operator='ge', version_type='loose')
 
-  - command: |
-      mysql -NBe "FLUSH PRIVILEGES; SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
-    changed_when: false
-    check_mode: false
-    when: mysql_version_register.stdout is version('8.0',operator='ge', version_type='loose')
-    
   - name: stop systemd
     systemd:
       name: "{{ mysql_daemon }}"

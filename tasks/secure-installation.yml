@@ -7,7 +7,7 @@
       state: stopped
   - name: add skip-grant-tables
     lineinfile:
-      path:  /etc/my.cnf
+      path: "{{ mysql_config_file }}"
       regexp: '^skip-grant-tables'
       insertafter: '^[[]mysqld[]]'
       line: 'skip-grant-tables'
@@ -25,21 +25,14 @@
     register: mysql_version_register
   - debug:
       msg: "{{ mysql_version_register.stdout }}"
-    when: mysql_version_register.stdout is version('8.0',operator='ge', version_type='loose')
 
-  - command: |
-      mysql -NBe "FLUSH PRIVILEGES; SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
-    changed_when: false
-    check_mode: false
-    when: mysql_version_register.stdout is version('8.0',operator='ge', version_type='loose')
-    
   - name: stop systemd
     systemd:
       name: "{{ mysql_daemon }}"
       state: stopped
   - name: remove skip-grant-tables
     lineinfile:
-      path:  /etc/my.cnf
+      path: "{{ mysql_config_file }}"
       regexp: '^skip-grant-tables'
       state: absent
   - name: start systemd
